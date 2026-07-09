@@ -14,6 +14,7 @@ WORKDIR /app
 COPY . .
 
 RUN cp .env.example .env \
+  && php artisan key:generate \
   && composer install --no-dev --optimize-autoloader \
   && chmod -R 777 storage bootstrap/cache
 
