@@ -3,6 +3,7 @@ echo "=== start.sh running ==="
 
 APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
 cat > .env << EOF
+APP_NAME="CTE NEMSU Tagbina"
 APP_ENV=production
 APP_DEBUG=false
 APP_KEY=${APP_KEY}
