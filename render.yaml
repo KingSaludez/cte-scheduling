@@ -2,7 +2,7 @@ services:
   - type: web
     name: cte-scheduling
     env: php
-    repo: https://github.com/YOUR_USERNAME/YOUR_REPO
+    repo: https://github.com/KingSaludez/cte-scheduling
     plan: free
     envVars:
       - key: APP_ENV
@@ -44,7 +44,6 @@ services:
 
 databases:
   - name: cte-db
-    type: pgsql
     plan: free
     databaseName: cte_scheduling
     region: singapore
