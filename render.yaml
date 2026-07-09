@@ -39,8 +39,6 @@ services:
         value: file
       - key: QUEUE_CONNECTION
         value: sync
-    dockerCommand: php artisan serve --host=0.0.0.0 --port=$PORT
-
 databases:
   - name: cte-db
     plan: free

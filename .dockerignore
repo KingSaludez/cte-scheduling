@@ -1,0 +1,14 @@
+/node_modules
+/.git
+/.env
+/vendor
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!storage/framework/cache/data
+!storage/framework/sessions
+!storage/framework/views
+!storage/logs
+.DS_Store
+docker-compose.yml
