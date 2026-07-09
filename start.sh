@@ -4,6 +4,9 @@ echo "APP_ENV=${APP_ENV:-not_set}"
 echo "DB_URL=${DB_URL:-not_set}"
 echo "APP_KEY length: ${#APP_KEY}"
 echo "SESSION_DRIVER=${SESSION_DRIVER:-not_set}"
+echo "=== All env vars ==="
+env | sort
+echo "=== End env vars ==="
 
 echo "APP_ENV=${APP_ENV:-production}" > .env
 echo "APP_DEBUG=${APP_DEBUG:-false}" >> .env
