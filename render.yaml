@@ -39,6 +39,8 @@ services:
         value: file
       - key: QUEUE_CONNECTION
         value: sync
+    postDeploy: php artisan migrate --force
+
 databases:
   - name: cte-db
     plan: free
