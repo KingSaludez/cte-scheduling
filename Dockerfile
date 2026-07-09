@@ -13,7 +13,9 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader \
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh \
+  && composer install --no-dev --optimize-autoloader \
   && chmod -R 777 storage bootstrap/cache
 
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+CMD /app/start.sh
