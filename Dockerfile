@@ -13,9 +13,9 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-RUN cp .env.example .env \
+RUN composer install --no-dev --optimize-autoloader \
+  && cp .env.example .env \
   && php artisan key:generate \
-  && composer install --no-dev --optimize-autoloader \
   && chmod -R 777 storage bootstrap/cache
 
 CMD php artisan serve --host=0.0.0.0 --port=$PORT
