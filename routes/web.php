@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\OutputController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoomController;
@@ -42,6 +43,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('archives', [ArchiveController::class, 'index'])->name('archives.index');
     Route::post('archives', [ArchiveController::class, 'store'])->name('archives.store');
     Route::get('archives/{archive}', [ArchiveController::class, 'show'])->name('archives.show');
+
+    Route::get('outputs/matrix', [OutputController::class, 'matrix'])->name('outputs.matrix');
+    Route::get('outputs/workload', [OutputController::class, 'workload'])->name('outputs.workload');
+    Route::get('outputs/workload/{faculty}/pdf', [OutputController::class, 'workloadPdf'])->name('outputs.workload-pdf');
+    Route::get('outputs/class-program', [OutputController::class, 'classProgram'])->name('outputs.class-program');
+    Route::get('outputs/class-program/{section}/pdf', [OutputController::class, 'classProgramPdf'])->name('outputs.class-program-pdf');
 });
 
 Route::middleware('auth')->group(function () {
