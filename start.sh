@@ -19,10 +19,22 @@ echo "Clearing caches..."
 php artisan route:clear
 php artisan view:clear
 
-echo "Running migrations..."
-php artisan migrate --force --no-interaction -v 2>&1 | tee /tmp/migration.log
-echo "=== Migration status ==="
-php artisan migrate:status 2>&1 | tee -a /tmp/migration.log
+echo "Running migrations (with retry)..."
+for i in 1 2 3 4 5; do
+  echo "--- Attempt $i ---"
+  php artisan migrate --force --no-interaction -v > /tmp/migration.log 2>&1
+  cat /tmp/migration.log
+  if grep -qi "Nothing to migrate" /tmp/migration.log; then
+    echo "All migrations already applied."
+    break
+  fi
+  if grep -qi "DONE" /tmp/migration.log; then
+    echo "Migrations applied successfully!"
+    break
+  fi
+  echo "Migration failed or pending, retrying in 3s..."
+  sleep 3
+done
 
 echo "Starting Laravel server..."
 php artisan serve --host=0.0.0.0 --port=$PORT
