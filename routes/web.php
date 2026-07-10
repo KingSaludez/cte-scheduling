@@ -25,31 +25,7 @@ Route::get('/ping', function () {
     return 'pong';
 });
 
-Route::get('/debug-db', function () {
-    try {
-        $hasProgramsTable = Schema::hasTable('programs');
-        $hasProgramIdCol = Schema::hasColumn('subjects', 'program_id');
-        $hasLockTable = Schema::hasTable('migration_lock');
-        $migrations = DB::table('migrations')->orderBy('id')->get();
-
-        // Check if migration files exist on disk
-        $files = glob(database_path('migrations/*.php'));
-        $fileNames = array_map(fn($f) => basename($f), $files);
-
-        return response()->json([
-            'has_programs_table' => $hasProgramsTable,
-            'has_program_id_col' => $hasProgramIdCol,
-            'has_lock_table' => $hasLockTable,
-            'migrations_in_db' => $migrations->map(fn($m) => ['migration' => $m->migration, 'batch' => $m->batch]),
-            'migration_count' => $migrations->count(),
-            'files_on_disk' => $fileNames,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-});
-
-Route::get('/run-migrations', function () {
+Route::middleware('auth')->get('/run-migrations', function () {
     try {
         Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
         $output = Artisan::output();
@@ -63,13 +39,6 @@ Route::get('/run-migrations', function () {
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
-});
-
-Route::get('/migration-log', function () {
-    if (file_exists('/tmp/migration.log')) {
-        return nl2br(file_get_contents('/tmp/migration.log'));
-    }
-    return 'No log file found at /tmp/migration.log';
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
