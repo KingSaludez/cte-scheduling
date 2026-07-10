@@ -20,7 +20,9 @@ php artisan route:clear
 php artisan view:clear
 
 echo "Running migrations..."
-php artisan migrate --force --isolated 2>&1 || echo "Migration had errors (continuing)"
+php artisan migrate --force --no-interaction -v 2>&1 | tee /tmp/migration.log
+echo "=== Migration status ==="
+php artisan migrate:status 2>&1 | tee -a /tmp/migration.log
 
 echo "Starting Laravel server..."
 php artisan serve --host=0.0.0.0 --port=$PORT

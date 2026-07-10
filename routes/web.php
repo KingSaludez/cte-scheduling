@@ -51,7 +51,7 @@ Route::get('/debug-db', function () {
 
 Route::middleware('auth')->get('/run-migrations', function () {
     try {
-        Artisan::call('migrate', ['--force' => true, '--isolated' => true]);
+        Artisan::call('migrate', ['--force' => true]);
         $output = Artisan::output();
         $hasProgramsTable = Schema::hasTable('programs');
         $migrations = DB::table('migrations')->orderBy('id')->get();
@@ -63,6 +63,13 @@ Route::middleware('auth')->get('/run-migrations', function () {
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
+});
+
+Route::get('/migration-log', function () {
+    if (file_exists('/tmp/migration.log')) {
+        return nl2br(file_get_contents('/tmp/migration.log'));
+    }
+    return 'No log file found at /tmp/migration.log';
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
