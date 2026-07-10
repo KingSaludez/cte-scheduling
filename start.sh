@@ -15,6 +15,7 @@ APP_URL=https://cte-scheduling.onrender.com
 APP_DEBUG=false
 APP_KEY=${APP_KEY}
 DB_CONNECTION=pgsql
+DB_URL=
 DB_HOST=${DB_HOST}
 DB_PORT=${DB_PORT}
 DB_DATABASE=${DB_NAME}
