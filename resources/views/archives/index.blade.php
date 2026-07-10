@@ -1,64 +1,104 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Semester Archives</h2>
-    </x-slot>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Archives - {{ config('app.name', 'CTE NEMSU Tagbina') }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
+        .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .topbar-brand { font-weight: 700; font-size: 18px; color: #1e40af; text-decoration: none; }
+        .topbar-brand span { color: #94a3b8; }
+        .hamburger { background: none; border: none; font-size: 24px; cursor: pointer; color: #475569; padding: 4px; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .topbar-right .user-name { font-size: 14px; font-weight: 500; color: #475569; }
+        .logout-form button { background: none; border: 1px solid #e2e8f0; color: #64748b; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; transition: all 0.15s; }
+        .logout-form button:hover { background: #f1f5f9; color: #ef4444; border-color: #fca5a5; }
+        .sidebar { position: fixed; top: 60px; left: -260px; width: 260px; bottom: 0; background: #fff; border-right: 1px solid #e2e8f0; transition: left 0.2s; z-index: 40; overflow-y: auto; padding: 16px 0; }
+        .sidebar.open { left: 0; }
+        .sidebar-overlay { position: fixed; top: 60px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 39; display: none; }
+        .sidebar-overlay.show { display: block; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #475569; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.15s; }
+        .sidebar a:hover { background: #f1f5f9; color: #1e40af; }
+        .sidebar a.active { background: #eff6ff; color: #1d4ed8; font-weight: 600; border-right: 3px solid #1d4ed8; }
+        .sidebar a svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .sidebar .nav-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 24px 6px; }
+        .main { padding: 20px 16px 40px; max-width: 1280px; margin: 0 auto; }
+        .page-header h1 { font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+        .page-header h1 span { color: #94a3b8; font-weight: 400; }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: inherit; border: none; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+        .btn-primary { background: #1d4ed8; color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,0.2); }
+        .btn-primary:hover { background: #1e40af; transform: translateY(-1px); }
+        .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+        .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+        .card-body { padding: 20px; }
+        .card-header { padding: 20px 20px 0; }
+        .alert { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .alert-danger { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 140px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none; transition: all 0.15s; }
+        .form-group input:focus, .form-group select:focus { border-color: #60a5fa; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 450px; }
+        thead { background: #f8fafc; }
+        th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+        td { padding: 12px 16px; border-top: 1px solid #f1f5f9; color: #334155; }
+        tr:hover td { background: #f8fafc; }
+        .empty { text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 14px; }
+        .pagination { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+        .pagination a, .pagination span { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #475569; text-decoration: none; transition: all 0.15s; }
+        .pagination a:hover { background: #f1f5f9; }
+        .pagination .active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+        .section-title { font-size: 16px; font-weight: 600; color: #1e40af; margin-bottom: 16px; }
+        .archive-card { border-top: 4px solid #1d4ed8; margin-bottom: 24px; }
+        @media (min-width: 1024px) { .sidebar { left: 0; } .hamburger { display: none; } .sidebar-overlay { display: none !important; } .main { margin-left: 260px; padding: 24px 32px; } }
+        @media (max-width: 639px) { .page-header h1 { font-size: 18px; } .form-row { flex-direction: column; } .form-group { min-width: 0; } .card-body { padding: 14px; } }
+    </style>
+</head>
+<body>
+<div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;"><button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.sidebar-overlay').classList.toggle('show');">☰</button><a href="{{ route('dashboard') }}" class="topbar-brand">CT<span>E</span></a></div>
+    <div class="topbar-right"><span class="user-name">{{ Auth::user()->name }}</span><form method="POST" action="{{ route('logout') }}" class="logout-form">@csrf<button>Log out</button></form></div>
+</div>
+<div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open');document.querySelector('.sidebar-overlay').classList.remove('show');"></div>
+<nav class="sidebar" onclick="if(window.innerWidth<1024){document.querySelector('.sidebar').classList.remove('open');document.querySelector('.sidebar-overlay').classList.remove('show');}">
+    <div class="nav-label">Menu</div>
+    <a href="{{ route('dashboard') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+    @if(Auth::user()->role !== 'faculty')<a href="{{ route('faculties.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Faculties</a>@endif
+    <a href="{{ route('subjects.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Subjects</a>
+    <a href="{{ route('sections.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Sections</a>
+    <a href="{{ route('rooms.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Rooms</a>
+    <a href="{{ route('schedules.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedules</a>
+    <a href="{{ route('archives.index') }}" class="active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>Archives</a>
+</nav>
+<div class="main">
+    <div class="page-header"><h1>Archives <span>· Semester archives</span></h1></div>
+    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+    @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
-            @endif
-            @if($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{{ $errors->first() }}</div>
-            @endif
-
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 border-t-4 border-primary-500">
-                <h3 class="text-lg font-semibold mb-4 text-primary-800">Archive a Semester</h3>
-                <form method="POST" action="{{ route('archives.store') }}" class="flex gap-4 items-end">
-                    @csrf
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Academic Year</label>
-                        <input type="text" name="academic_year" value="{{ old('academic_year', date('Y').'-'.(date('Y')+1)) }}" class="border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Semester</label>
-                        <select name="semester" class="border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500" required>
-                            <option value="1st">1st</option>
-                            <option value="2nd">2nd</option>
-                            <option value="summer">Summer</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded">Archive</button>
-                </form>
+    <div class="card archive-card"><div class="card-body">
+        <div class="section-title">Archive a Semester</div>
+        <form method="POST" action="{{ route('archives.store') }}">
+            @csrf
+            <div class="form-row">
+                <div class="form-group"><label>Academic Year</label><input type="text" name="academic_year" value="{{ old('academic_year', date('Y').'-'.(date('Y')+1)) }}" required></div>
+                <div class="form-group"><label>Semester</label><select name="semester" required><option value="1st">1st</option><option value="2nd">2nd</option><option value="summer">Summer</option></select></div>
+                <button type="submit" class="btn btn-primary">Archive</button>
             </div>
+        </form>
+    </div></div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-primary-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-primary-800 uppercase">Academic Year</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-primary-800 uppercase">Semester</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-primary-800 uppercase">Archived At</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-primary-800 uppercase">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @forelse($archives as $archive)
-                            <tr class="hover:bg-golden-50">
-                                <td class="px-6 py-4">{{ $archive->academic_year }}</td>
-                                <td class="px-6 py-4">{{ $archive->semester }}</td>
-                                <td class="px-6 py-4">{{ $archive->archived_at->format('M d, Y h:i A') }}</td>
-                                <td class="px-6 py-4"><a href="{{ route('archives.show', $archive) }}" class="bg-primary-600 hover:bg-primary-700 text-white py-1 px-3 rounded text-xs">View</a></td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No archives found.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <div class="mt-4">{{ $archives->links() }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+    <div class="card"><div class="card-body">
+        <div class="section-title">Archived Semesters</div>
+        <div class="table-wrap"><table><thead><tr><th>Academic Year</th><th>Semester</th><th>Archived At</th><th>Actions</th></tr></thead><tbody>@forelse($archives as $archive)<tr><td>{{ $archive->academic_year }}</td><td>{{ $archive->semester }}</td><td>{{ $archive->archived_at->format('M d, Y h:i A') }}</td><td><a href="{{ route('archives.show', $archive) }}" class="btn btn-primary btn-sm">View</a></td></tr>@empty<tr><td colspan="4"><div class="empty">No archives found.</div></td></tr>@endforelse</tbody></table></div>
+        <div class="pagination">{{ $archives->links() }}</div>
+    </div></div>
+</div>
+</body>
+</html>
