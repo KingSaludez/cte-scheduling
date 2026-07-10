@@ -33,6 +33,16 @@ class OutputController extends Controller
             return view('outputs.matrix', array_merge($cached, compact('pageTitle')));
         }
 
+        $timeSlots = [];
+        $timeLabels = [];
+        for ($h = 7; $h <= 20; $h++) {
+            $hStr = sprintf('%02d', $h);
+            $timeSlots[] = $hStr . ':00';
+            $timeLabels[$hStr . ':00'] = ($h > 12 ? $h - 12 : $h) . ':00 ' . ($h >= 12 ? 'PM' : 'AM');
+            $timeSlots[] = $hStr . ':30';
+            $timeLabels[$hStr . ':30'] = ($h > 12 ? $h - 12 : $h) . ':30 ' . ($h >= 12 ? 'PM' : 'AM');
+        }
+
         $rooms = Room::active()->with('sections')->orderBy('room_number')->get();
         $schedules = Schedule::with(['faculty', 'subject', 'section', 'room'])
             ->where('day', $selectedDay)
@@ -116,8 +126,6 @@ class OutputController extends Controller
             ->where('academic_year', $academicYear)
             ->where('semester', $semester)
             ->orderBy('start_time')->get();
-        $subjects = Subject::active()->orderBy('code')->get();
-        $faculties = Faculty::active()->orderBy('full_name')->get();
         $matrix = [];
         foreach ($schedules as $s) {
             $matrix[$s->section_id . '-' . $s->room_id][$s->start_time] = $s;
