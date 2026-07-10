@@ -8,13 +8,15 @@ RUN apt-get update && apt-get install -y \
     curl \
     nodejs \
     npm \
-  && docker-php-ext-install pdo pdo_pgsql pgsql
+  && docker-php-ext-install pdo pdo_pgsql pgsql \
+  && docker-php-ext-enable opcache
 
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 COPY . .
 
+COPY php.ini /usr/local/etc/php/conf.d/performance.ini
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh \
   && npm ci && npm run build \

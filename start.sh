@@ -15,9 +15,8 @@ CACHE_STORE=file
 QUEUE_CONNECTION=sync
 EOF
 
-echo "Clearing caches..."
-php artisan route:clear 2>&1
-php artisan view:clear 2>&1
+echo "Warming caches..."
+php artisan optimize 2>&1
 
 echo "Running migrations..."
 for i in 1 2 3; do
@@ -25,5 +24,5 @@ for i in 1 2 3; do
   [ "$i" -lt 3 ] && echo "Retry $i..." && sleep 3
 done
 
-echo "Starting Laravel server..."
-php artisan serve --host=0.0.0.0 --port=$PORT
+echo "Starting PHP server..."
+exec php -S 0.0.0.0:${PORT} -t public

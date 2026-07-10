@@ -10,29 +10,30 @@ use App\Models\Subject;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class OutputController extends Controller
 {
     public function matrix(Request $request)
     {
-        $rooms = Room::active()->with('sections')->orderBy('room_number')->get();
         $dayLabels = ['M' => 'Monday', 'T' => 'Tuesday', 'Th' => 'Thursday', 'F' => 'Friday', 'S' => 'Saturday'];
         $selectedDayCode = $request->day ?? 'M';
         $selectedDay = $dayLabels[$selectedDayCode] ?? 'Monday';
-
-        $timeSlots = [];
-        $timeLabels = [];
-        for ($h = 7; $h <= 20; $h++) {
-            $hStr = sprintf('%02d', $h);
-            $timeSlots[] = $hStr . ':00';
-            $timeLabels[$hStr . ':00'] = ($h > 12 ? $h - 12 : $h) . ':00 ' . ($h >= 12 ? 'PM' : 'AM');
-            $timeSlots[] = $hStr . ':30';
-            $timeLabels[$hStr . ':30'] = ($h > 12 ? $h - 12 : $h) . ':30 ' . ($h >= 12 ? 'PM' : 'AM');
-        }
-
         $academicYear = $request->academic_year ?? date('Y') . '-' . (date('Y') + 1);
         $semester = $request->semester ?? '1st';
+        $pageTitle = 'Master Schedule Matrix';
 
+        if ($request->has('pdf')) {
+            return $this->matrixPdf($selectedDay, $academicYear, $semester, $dayLabels, $selectedDayCode);
+        }
+
+        $cacheKey = "matrix_{$selectedDayCode}_{$academicYear}_{$semester}";
+        $cached = Cache::get($cacheKey);
+        if ($cached) {
+            return view('outputs.matrix', array_merge($cached, compact('pageTitle')));
+        }
+
+        $rooms = Room::active()->with('sections')->orderBy('room_number')->get();
         $schedules = Schedule::with(['faculty', 'subject', 'section', 'room'])
             ->where('day', $selectedDay)
             ->where('academic_year', $academicYear)
@@ -93,14 +94,79 @@ class OutputController extends Controller
             $cellMeta[$key] = $meta;
         }
 
-        if ($request->has('pdf')) {
-            $pdf = Pdf::loadView('outputs.matrix-pdf', compact('columns', 'timeSlots', 'timeLabels', 'cellStates', 'cellMeta', 'selectedDay', 'selectedDayCode', 'dayLabels', 'academicYear', 'semester'));
-            $pdf->setPaper('A4', 'landscape');
-            return $pdf->download('master-schedule-matrix.pdf');
-        }
+        $viewData = compact('columns', 'timeSlots', 'timeLabels', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'subjects', 'faculties', 'academicYear', 'semester', 'cellStates', 'cellMeta');
+        Cache::put($cacheKey, $viewData, now()->addMinutes(5));
+        return view('outputs.matrix', array_merge($viewData, compact('pageTitle')));
+    }
 
-        $pageTitle = 'Master Schedule Matrix';
-        return view('outputs.matrix', compact('columns', 'timeSlots', 'timeLabels', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'subjects', 'faculties', 'academicYear', 'semester', 'pageTitle', 'cellStates', 'cellMeta'));
+    private function matrixPdf($selectedDay, $academicYear, $semester, $dayLabels, $selectedDayCode)
+    {
+        $rooms = Room::active()->with('sections')->orderBy('room_number')->get();
+        $timeSlots = [];
+        $timeLabels = [];
+        for ($h = 7; $h <= 20; $h++) {
+            $hStr = sprintf('%02d', $h);
+            $timeSlots[] = $hStr . ':00';
+            $timeLabels[$hStr . ':00'] = ($h > 12 ? $h - 12 : $h) . ':00 ' . ($h >= 12 ? 'PM' : 'AM');
+            $timeSlots[] = $hStr . ':30';
+            $timeLabels[$hStr . ':30'] = ($h > 12 ? $h - 12 : $h) . ':30 ' . ($h >= 12 ? 'PM' : 'AM');
+        }
+        $schedules = Schedule::with(['faculty', 'subject', 'section', 'room'])
+            ->where('day', $selectedDay)
+            ->where('academic_year', $academicYear)
+            ->where('semester', $semester)
+            ->orderBy('start_time')->get();
+        $subjects = Subject::active()->orderBy('code')->get();
+        $faculties = Faculty::active()->orderBy('full_name')->get();
+        $matrix = [];
+        foreach ($schedules as $s) {
+            $matrix[$s->section_id . '-' . $s->room_id][$s->start_time] = $s;
+        }
+        $columns = [];
+        foreach ($rooms as $room) {
+            if ($room->sections->count() > 0) {
+                foreach ($room->sections as $section) {
+                    $columns[] = ['room' => $room, 'section' => $section, 'key' => $section->id . '-' . $room->id];
+                }
+            }
+        }
+        $cellStates = [];
+        $cellMeta = [];
+        $lunchSlots = ['12:00', '12:30'];
+        foreach ($columns as $col) {
+            $key = $col['key'];
+            $scheds = $matrix[$key] ?? [];
+            $states = [];
+            $meta = [];
+            foreach ($timeSlots as $t) {
+                $states[$t] = in_array($t, $lunchSlots) ? 'lunch' : 'empty';
+                $meta[$t] = null;
+            }
+            foreach ($scheds as $startTime => $sched) {
+                $startIdx = array_search($startTime, $timeSlots);
+                if ($startIdx === false) continue;
+                $endIdx = array_search($sched->end_time, $timeSlots);
+                if ($endIdx === false || $endIdx <= $startIdx) $endIdx = count($timeSlots);
+                $lunchIdx = array_search('12:00', $timeSlots);
+                if ($lunchIdx !== false && $startIdx < $lunchIdx && $endIdx > $lunchIdx) {
+                    $endIdx = $lunchIdx;
+                }
+                $rowspan = $endIdx - $startIdx;
+                if ($rowspan <= 0) continue;
+                $states[$startTime] = 'schedule';
+                $meta[$startTime] = ['schedule' => $sched, 'rowspan' => $rowspan];
+                for ($j = $startIdx + 1; $j < $endIdx; $j++) {
+                    if (!in_array($timeSlots[$j], $lunchSlots)) {
+                        $states[$timeSlots[$j]] = 'skip';
+                    }
+                }
+            }
+            $cellStates[$key] = $states;
+            $cellMeta[$key] = $meta;
+        }
+        $pdf = Pdf::loadView('outputs.matrix-pdf', compact('columns', 'timeSlots', 'timeLabels', 'cellStates', 'cellMeta', 'selectedDay', 'selectedDayCode', 'dayLabels', 'academicYear', 'semester'));
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('master-schedule-matrix.pdf');
     }
 
     public function matrixStore(Request $request)
@@ -158,6 +224,8 @@ class OutputController extends Controller
             ? count($created) . ' created, but conflicts blocked: ' . implode('; ', $conflicts)
             : null;
 
+        $this->clearMatrixCache($validated['days'], $validated['academic_year'], $validated['semester']);
+
         return response()->json([
             'success' => true,
             'count' => count($created),
@@ -167,8 +235,20 @@ class OutputController extends Controller
 
     public function matrixDestroy(Schedule $schedule)
     {
+        $dayCodes = ['Monday' => 'M', 'Tuesday' => 'T', 'Thursday' => 'Th', 'Friday' => 'F', 'Saturday' => 'S'];
+        $code = $dayCodes[$schedule->day] ?? null;
+        if ($code) {
+            Cache::forget("matrix_{$code}_{$schedule->academic_year}_{$schedule->semester}");
+        }
         $schedule->delete();
         return response()->json(['success' => true]);
+    }
+
+    private function clearMatrixCache(array $days, string $academicYear, string $semester): void
+    {
+        foreach ($days as $code) {
+            Cache::forget("matrix_{$code}_{$academicYear}_{$semester}");
+        }
     }
 
     private function checkConflict($roomId, $facultyId, $day, $start, $end, $excludeSectionId = null)
