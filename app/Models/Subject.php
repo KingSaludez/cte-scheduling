@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subject extends Model
 {
     protected $fillable = [
-        'code', 'title', 'units', 'lecture_hours', 'lab_hours',
+        'program_id', 'code', 'title', 'units', 'lecture_hours', 'lab_hours',
         'year_level', 'semester', 'program', 'prerequisites', 'is_archived',
     ];
 
@@ -18,6 +19,11 @@ class Subject extends Model
         return [
             'is_archived' => 'boolean',
         ];
+    }
+
+    public function program(): BelongsTo
+    {
+        return $this->belongsTo(Program::class);
     }
 
     public function qualifiedFaculties(): BelongsToMany

@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\OutputController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ScheduleController;
@@ -43,6 +44,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('reports/class-program', [ReportController::class, 'classProgram'])->name('reports.class-program');
     Route::get('reports/subject-assignments', [ReportController::class, 'subjectAssignments'])->name('reports.subject-assignments');
     Route::get('reports/room-utilization', [ReportController::class, 'roomUtilization'])->name('reports.room-utilization');
+
+    Route::get('programs', [ProgramController::class, 'index'])->name('programs.index');
+    Route::post('programs', [ProgramController::class, 'store'])->name('programs.store');
+    Route::get('programs/{program}/subjects', [ProgramController::class, 'subjects'])->name('programs.subjects');
+    Route::get('programs/{program}/subjects/create', [ProgramController::class, 'createSubject'])->name('programs.create-subject');
+    Route::post('programs/{program}/subjects', [ProgramController::class, 'storeSubject'])->name('programs.store-subject');
 
     Route::get('archives', [ArchiveController::class, 'index'])->name('archives.index');
     Route::post('archives', [ArchiveController::class, 'store'])->name('archives.store');

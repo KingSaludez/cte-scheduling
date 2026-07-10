@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Sections - {{ config('app.name', 'CTE NEMSU Tagbina') }}</title>
+    <title>Programs - {{ config('app.name') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,54 +34,44 @@
         .btn-primary { background: #1d4ed8; color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,0.2); }
         .btn-primary:hover { background: #1e40af; transform: translateY(-1px); }
         .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
-        .btn-warning { background: #d97706; color: #fff; }
-        .btn-warning:hover { background: #b45309; }
-        .btn-danger { background: #ef4444; color: #fff; }
-        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: transparent; color: #475569; border: 1.5px solid #e2e8f0; }
+        .btn-outline:hover { background: #f1f5f9; border-color: #94a3b8; }
         .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
         .card-body { padding: 20px; }
         .alert { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; }
         .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-        .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-        .filter-bar input, .filter-bar select { padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none; transition: all 0.15s; flex: 1; min-width: 140px; }
-        .filter-bar input:focus, .filter-bar select:focus { border-color: #60a5fa; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .filter-bar .btn { flex: 0 0 auto; }
-        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 500px; }
-        thead { background: #f8fafc; }
-        th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
-        td { padding: 12px 16px; border-top: 1px solid #f1f5f9; color: #334155; }
-        tr:hover td { background: #f8fafc; }
-        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-        .empty { text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 14px; }
-        .pagination { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
-        .pagination a, .pagination span { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #475569; text-decoration: none; transition: all 0.15s; }
-        .pagination a:hover { background: #f1f5f9; }
-        .pagination .active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+        .program-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .program-card { background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 24px; text-align: center; border: 2px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
+        .program-card:hover { border-color: #1d4ed8; box-shadow: 0 4px 16px rgba(29,78,216,0.12); transform: translateY(-2px); }
+        .program-card .code { font-size: 28px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px; }
+        .program-card .name { font-size: 14px; color: #64748b; margin-bottom: 12px; }
+        .program-card .count { font-size: 13px; color: #94a3b8; }
+        .program-card .count span { font-weight: 600; color: #1e293b; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 60; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 25px 80px rgba(0,0,0,0.15); }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none; transition: all 0.15s; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #60a5fa; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
         @media (min-width: 1024px) { .sidebar { left: 0; } .hamburger { display: none; } .sidebar-overlay { display: none !important; } .main { margin-left: 260px; padding: 24px 32px; } }
-        @media (max-width: 639px) { .page-header h1 { font-size: 18px; } .filter-bar { flex-direction: column; } .filter-bar input, .filter-bar select { min-width: 0; } .card-body { padding: 14px; } }
     </style>
 </head>
 <body>
 <div class="topbar">
-    <div style="display:flex;align-items:center;gap:12px;">
-        <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.sidebar-overlay').classList.toggle('show');">☰</button>
-        <a href="{{ route('dashboard') }}" class="topbar-brand">CT<span>E</span></a>
-    </div>
-    <div class="topbar-right">
-        <span class="user-name">{{ Auth::user()->name }}</span>
-        <form method="POST" action="{{ route('logout') }}" class="logout-form">@csrf<button>Log out</button></form>
-    </div>
+    <div style="display:flex;align-items:center;gap:12px;"><button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.sidebar-overlay').classList.toggle('show');">☰</button><a href="{{ route('dashboard') }}" class="topbar-brand">CT<span>E</span></a></div>
+    <div class="topbar-right"><span class="user-name">{{ Auth::user()->name }}</span><form method="POST" action="{{ route('logout') }}" class="logout-form">@csrf<button>Log out</button></form></div>
 </div>
 <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open');document.querySelector('.sidebar-overlay').classList.remove('show');"></div>
 <nav class="sidebar" onclick="if(window.innerWidth<1024){document.querySelector('.sidebar').classList.remove('open');document.querySelector('.sidebar-overlay').classList.remove('show');}">
     <div class="nav-label">Menu</div>
     <a href="{{ route('dashboard') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
     @if(Auth::user()->role !== 'faculty')<a href="{{ route('faculties.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Faculties</a>@endif
-    <a href="{{ route('programs.index') }}">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg> Programs</a>
+    <a href="{{ route('programs.index') }}" class="active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>Programs</a>
     <a href="{{ route('subjects.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Subjects</a>
-    <a href="{{ route('sections.index') }}" class="active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Sections</a>
+    <a href="{{ route('sections.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Sections</a>
     <a href="{{ route('rooms.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Rooms</a>
     <a href="{{ route('schedules.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedules</a>
     <a href="{{ route('outputs.matrix') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>Master Matrix</a>
@@ -90,18 +80,41 @@
     <a href="{{ route('archives.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>Archives</a>
 </nav>
 <div class="main">
-    <div class="page-header"><h1>Sections <span>· Manage sections</span></h1><a href="{{ route('sections.create') }}" class="btn btn-primary">+ Add Section</a></div>
+    <div class="page-header"><h1>Programs <span>· Manage programs</span></h1><button class="btn btn-primary" onclick="showModal()">+ Create Program</button></div>
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    <div class="card"><div class="card-body">
-        <form method="GET" class="filter-bar">
-            <input type="text" name="search" placeholder="Search name..." value="{{ request('search') }}">
-            <select name="year_level"><option value="">All Years</option>@for($i=1;$i<=6;$i++)<option value="{{$i}}" {{ request('year_level') == $i ? 'selected' : '' }}>{{$i}}</option>@endfor</select>
-            <select name="semester"><option value="">All Sem</option><option value="1st" {{ request('semester') == '1st' ? 'selected' : '' }}>1st</option><option value="2nd" {{ request('semester') == '2nd' ? 'selected' : '' }}>2nd</option><option value="summer" {{ request('semester') == 'summer' ? 'selected' : '' }}>Summer</option></select>
-            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-        </form>
-        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Year</th><th>Students</th><th>Semester</th><th>Acad Year</th><th>Actions</th></tr></thead><tbody>@forelse($sections as $section)<tr><td>{{ $section->name }}</td><td>{{ $section->year_level }}</td><td>{{ $section->student_count }}</td><td>{{ $section->semester }}</td><td>{{ $section->academic_year }}</td><td><div class="actions"><a href="{{ route('sections.show', $section) }}" class="btn btn-primary btn-sm">View</a><a href="{{ route('sections.edit', $section) }}" class="btn btn-warning btn-sm">Edit</a><form action="{{ route('sections.destroy', $section) }}" method="POST" onsubmit="return confirm('Delete this section?');">@csrf @method('DELETE')<button type="submit" class="btn btn-danger btn-sm">Delete</button></form></div></td></tr>@empty<tr><td colspan="6"><div class="empty">No sections found.</div></td></tr>@endforelse</tbody></table></div>
-        <div class="pagination">{{ $sections->links() }}</div>
-    </div></div>
+
+    <div class="program-grid">
+        @forelse($programs as $prog)
+        <a href="{{ route('programs.subjects', $prog) }}" class="program-card">
+            <div class="code">{{ $prog->code }}</div>
+            <div class="name">{{ $prog->name }}</div>
+            <div class="count"><span>{{ $prog->subjects_count }}</span> subjects</div>
+        </a>
+        @empty
+        <div class="card" style="grid-column:1/-1;"><div class="card-body" style="text-align:center;color:#94a3b8;padding:40px;">No programs yet. Create one to get started.</div></div>
+        @endforelse
+    </div>
 </div>
+
+<div class="modal-overlay" id="programModal" onclick="if(event.target===this)hideModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+        <h2>Create Program</h2>
+        <form method="POST" action="{{ route('programs.store') }}">
+            @csrf
+            <div class="form-group"><label>Program Code</label><input type="text" name="code" placeholder="e.g. BEED" required></div>
+            <div class="form-group"><label>Program Name</label><input type="text" name="name" placeholder="e.g. Bachelor of Elementary Education" required></div>
+            <div class="form-group"><label>Description</label><textarea name="description" rows="3" placeholder="Optional description"></textarea></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="hideModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showModal(){document.getElementById('programModal').classList.add('show')}
+function hideModal(){document.getElementById('programModal').classList.remove('show')}
+</script>
 </body>
 </html>
