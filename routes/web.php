@@ -12,7 +12,9 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SchedulingController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubjectController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,6 +22,22 @@ Route::get('/', function () {
 
 Route::get('/ping', function () {
     return 'pong';
+});
+
+Route::get('/debug-db', function () {
+    try {
+        $hasProgramsTable = Schema::hasTable('programs');
+        $hasProgramIdCol = Schema::hasColumn('subjects', 'program_id');
+        $migrations = DB::table('migrations')->orderBy('id')->get();
+        return response()->json([
+            'has_programs_table' => $hasProgramsTable,
+            'has_program_id_col' => $hasProgramIdCol,
+            'migrations' => $migrations->pluck('migration'),
+            'migration_count' => $migrations->count(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
