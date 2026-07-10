@@ -15,8 +15,10 @@ CACHE_STORE=file
 QUEUE_CONNECTION=sync
 EOF
 
-echo "Clearing route cache..."
+echo "Clearing caches..."
 php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
 
 echo "Running migrations..."
 php artisan migrate --force
