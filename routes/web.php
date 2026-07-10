@@ -49,7 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('subjects', SubjectController::class)->except(['index']);
     Route::resource('sections', SectionController::class);
     Route::resource('rooms', RoomController::class);
-    Route::get('schedules', [SchedulingController::class, 'index'])->name('schedules.index');
+    Route::post('rooms/{room}/sections', [RoomController::class, 'storeSection'])->name('rooms.sections.store');
+    Route::delete('rooms/{room}/sections/{section}', [RoomController::class, 'destroySection'])->name('rooms.sections.destroy');
+    Route::get('schedules', fn() => redirect()->route('outputs.matrix'))->name('schedules.index');
     Route::get('schedules/create', [SchedulingController::class, 'create'])->name('schedules.create');
     Route::post('schedules/generate', [SchedulingController::class, 'generate'])->name('schedules.generate');
     Route::get('schedules/{schedule}', [SchedulingController::class, 'show'])->name('schedules.show');
@@ -76,6 +78,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('archives/{archive}', [ArchiveController::class, 'show'])->name('archives.show');
 
     Route::get('outputs/matrix', [OutputController::class, 'matrix'])->name('outputs.matrix');
+    Route::post('outputs/matrix/schedule', [OutputController::class, 'matrixStore'])->name('outputs.matrix.store');
+    Route::delete('outputs/matrix/schedule/{schedule}', [OutputController::class, 'matrixDestroy'])->name('outputs.matrix.destroy');
     Route::get('outputs/workload', [OutputController::class, 'workload'])->name('outputs.workload');
     Route::get('outputs/workload/{faculty}/pdf', [OutputController::class, 'workloadPdf'])->name('outputs.workload-pdf');
     Route::get('outputs/class-program', [OutputController::class, 'classProgram'])->name('outputs.class-program');

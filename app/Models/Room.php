@@ -23,6 +23,11 @@ class Room extends Model
         return $this->hasMany(Schedule::class);
     }
 
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_archived', false);

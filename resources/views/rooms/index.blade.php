@@ -34,10 +34,13 @@
         .btn-primary { background: #1d4ed8; color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,0.2); }
         .btn-primary:hover { background: #1e40af; transform: translateY(-1px); }
         .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+        .btn-xs { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
         .btn-warning { background: #d97706; color: #fff; }
         .btn-warning:hover { background: #b45309; }
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: transparent; color: #475569; border: 1.5px solid #e2e8f0; }
+        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
         .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
         .card-body { padding: 20px; }
         .alert { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; }
@@ -46,13 +49,6 @@
         .filter-bar input, .filter-bar select { padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none; transition: all 0.15s; flex: 1; min-width: 140px; }
         .filter-bar input:focus, .filter-bar select:focus { border-color: #60a5fa; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         .filter-bar .btn { flex: 0 0 auto; }
-        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 450px; }
-        thead { background: #f8fafc; }
-        th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
-        td { padding: 12px 16px; border-top: 1px solid #f1f5f9; color: #334155; }
-        tr:hover td { background: #f8fafc; }
-        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
         .empty { text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 14px; }
         .pagination { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
         .pagination a, .pagination span { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #475569; text-decoration: none; transition: all 0.15s; }
@@ -61,8 +57,42 @@
         .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
         .badge-primary { background: #dbeafe; color: #1e40af; }
         .badge-golden { background: #fef3c7; color: #92400e; }
+        .badge-blue { background: #e0f2fe; color: #075985; }
+        .room-grid { display: flex; flex-direction: column; gap: 16px; }
+        .room-card { background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; transition: box-shadow 0.15s; }
+        .room-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .room-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid #f1f5f9; }
+        .room-info { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .room-info .room-number { font-size: 18px; font-weight: 700; color: #0f172a; }
+        .room-info .room-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #64748b; }
+        .room-info .room-meta span { display: flex; align-items: center; gap: 4px; }
+        .room-header-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+        .sections-area { padding: 14px 20px 18px; }
+        .sections-area .label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .sections-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .section-pill { display: inline-flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 4px 4px 4px 14px; font-size: 13px; color: #334155; transition: all 0.15s; }
+        .section-pill:hover { background: #f1f5f9; }
+        .section-pill .sec-name { font-weight: 600; }
+        .section-pill .sec-year { color: #64748b; font-size: 12px; }
+        .section-pill .sec-students { color: #64748b; font-size: 12px; }
+        .section-pill .sec-delete { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; border: none; background: transparent; color: #94a3b8; cursor: pointer; font-size: 16px; transition: all 0.15s; }
+        .section-pill .sec-delete:hover { background: #fee2e2; color: #ef4444; }
+        .no-sections { font-size: 13px; color: #94a3b8; font-style: italic; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: #fff; border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); padding: 28px; animation: modalIn 0.15s ease-out; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+        .modal .form-group { margin-bottom: 16px; }
+        .modal .form-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        .modal .form-group input, .modal .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none; transition: all 0.15s; }
+        .modal .form-group input:focus, .modal .form-group select:focus { border-color: #60a5fa; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+        .modal .btn-cancel { background: #f1f5f9; color: #475569; }
+        .modal .btn-cancel:hover { background: #e2e8f0; }
+        .text-muted { color: #94a3b8; }
         @media (min-width: 1024px) { .sidebar { left: 0; } .hamburger { display: none; } .sidebar-overlay { display: none !important; } .main { margin-left: 260px; padding: 24px 32px; } }
-        @media (max-width: 639px) { .page-header h1 { font-size: 18px; } .filter-bar { flex-direction: column; } .filter-bar input, .filter-bar select { min-width: 0; } .card-body { padding: 14px; } }
+        @media (max-width: 639px) { .page-header h1 { font-size: 18px; } .filter-bar { flex-direction: column; } .filter-bar input, .filter-bar select { min-width: 0; } .card-body { padding: 14px; } .room-header { flex-direction: column; align-items: flex-start; } .modal { padding: 20px; } }
     </style>
 </head>
 <body>
@@ -75,9 +105,8 @@
     <div class="nav-label">Menu</div>
     <a href="{{ route('dashboard') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
     <a href="{{ route('faculties.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Faculties</a>
-    <a href="{{ route('programs.index') }}">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg> Programs</a>
-    <a href="{{ route('sections.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Sections</a>
+    <a href="{{ route('programs.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg> Programs</a>
+    <a href="{{ route('rooms.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Sections</a>
     <a href="{{ route('rooms.index') }}" class="active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Rooms</a>
     <a href="{{ route('schedules.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedules</a>
     <a href="{{ route('outputs.matrix') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>Master Matrix</a>
@@ -86,7 +115,7 @@
     <a href="{{ route('archives.index') }}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>Archives</a>
 </nav>
 <div class="main">
-    <div class="page-header"><h1>Rooms <span>· Manage rooms</span></h1><a href="{{ route('rooms.create') }}" class="btn btn-primary">+ Add Room</a></div>
+    <div class="page-header"><h1>Rooms <span>· Manage rooms &amp; sections</span></h1><button class="btn btn-primary" onclick="openRoomModal()">+ Add Room</button></div>
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     <div class="card"><div class="card-body">
         <form method="GET" class="filter-bar">
@@ -94,9 +123,89 @@
             <select name="room_type"><option value="">All Types</option><option value="lecture" {{ request('room_type') == 'lecture' ? 'selected' : '' }}>Lecture</option><option value="lab" {{ request('room_type') == 'lab' ? 'selected' : '' }}>Lab</option></select>
             <button type="submit" class="btn btn-primary btn-sm">Filter</button>
         </form>
-        <div class="table-wrap"><table><thead><tr><th>Room</th><th>Building</th><th>Capacity</th><th>Type</th><th>Actions</th></tr></thead><tbody>@forelse($rooms as $room)<tr><td>{{ $room->room_number }}</td><td>{{ $room->building ?? 'N/A' }}</td><td>{{ $room->capacity }}</td><td><span class="badge {{ $room->room_type == 'lecture' ? 'badge-primary' : 'badge-golden' }}">{{ ucfirst($room->room_type) }}</span></td><td><div class="actions"><a href="{{ route('rooms.show', $room) }}" class="btn btn-primary btn-sm">View</a><a href="{{ route('rooms.edit', $room) }}" class="btn btn-warning btn-sm">Edit</a><form action="{{ route('rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Delete this room?');">@csrf @method('DELETE')<button type="submit" class="btn btn-danger btn-sm">Delete</button></form></div></td></tr>@empty<tr><td colspan="5"><div class="empty">No rooms found.</div></td></tr>@endforelse</tbody></table></div>
+        @forelse($rooms as $room)
+            <div class="room-card" style="{{ !$loop->first ? 'margin-top:16px;' : '' }}">
+                <div class="room-header">
+                    <div class="room-info">
+                        <span class="room-number">{{ $room->room_number }}</span>
+                        <div class="room-meta">
+                            <span>🏢 {{ $room->building ?? 'N/A' }}</span>
+                            <span>·</span>
+                            <span>👤 {{ $room->capacity }}</span>
+                            <span>·</span>
+                            <span class="badge {{ $room->room_type == 'lecture' ? 'badge-primary' : 'badge-golden' }}">{{ ucfirst($room->room_type) }}</span>
+                        </div>
+                    </div>
+                    <div class="room-header-actions">
+                        <button class="btn btn-primary btn-xs" onclick="openSectionModal({{ $room->id }})">+ Section</button>
+                        <a href="{{ route('rooms.show', $room) }}" class="btn btn-primary btn-xs">View</a>
+                        <a href="{{ route('rooms.edit', $room) }}" class="btn btn-warning btn-xs">Edit</a>
+                        <form action="{{ route('rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Delete this room?');" style="display:inline;">@csrf @method('DELETE')<button type="submit" class="btn btn-danger btn-xs">Delete</button></form>
+                    </div>
+                </div>
+                <div class="sections-area">
+                    <div class="label">Sections</div>
+                    @if($room->sections->count() > 0)
+                        <div class="sections-list">
+                            @foreach($room->sections as $section)
+                                <div class="section-pill">
+                                    <span class="sec-name">{{ $section->name }}</span>
+                                    <span class="sec-year">Y{{ $section->year_level }}</span>
+                                    @if($section->student_count > 0)<span class="sec-students">({{ $section->student_count }})</span>@endif
+                                    <form action="{{ route('rooms.sections.destroy', [$room, $section]) }}" method="POST" onsubmit="return confirm('Delete section {{ $section->name }}?');" style="display:inline;">@csrf @method('DELETE')<button type="submit" class="sec-delete" title="Delete section">×</button></form>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="no-sections">No sections assigned yet.</div>
+                    @endif
+                </div>
+            </div>
+        @empty
+            <div class="empty">No rooms found.</div>
+        @endforelse
         <div class="pagination">{{ $rooms->links() }}</div>
     </div></div>
 </div>
+
+<div class="modal-overlay" id="roomModal">
+    <div class="modal">
+        <h2>Add Room</h2>
+        <form method="POST" action="{{ route('rooms.store') }}">
+            @csrf
+            <div class="form-group"><label>Room Number</label><input type="text" name="room_number" required></div>
+            <div class="form-group"><label>Building</label><input type="text" name="building"></div>
+            <div class="form-group"><label>Capacity</label><input type="number" name="capacity" required min="1"></div>
+            <div class="form-group"><label>Room Type</label><select name="room_type" required><option value="lecture">Lecture</option><option value="lab">Lab</option></select></div>
+            <div class="modal-actions"><button type="button" class="btn btn-cancel" onclick="closeModal('roomModal')">Cancel</button><button type="submit" class="btn btn-primary">Create Room</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="sectionModal">
+    <div class="modal">
+        <h2>Add Section</h2>
+        <form method="POST" action="" id="sectionForm">
+            @csrf
+            <input type="hidden" name="room_id" id="sectionRoomId">
+            <div class="form-group"><label>Section Name</label><input type="text" name="name" required placeholder="e.g. A, B, 1A"></div>
+            <div class="form-group"><label>Year Level</label><select name="year_level" required>@for($i=1;$i<=6;$i++)<option value="{{ $i }}">{{ $i }}</option>@endfor</select></div>
+            <div class="form-group"><label>Student Count</label><input type="number" name="student_count" min="0" placeholder="Optional"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-cancel" onclick="closeModal('sectionModal')">Cancel</button><button type="submit" class="btn btn-primary">Create Section</button></div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRoomModal() { document.getElementById('roomModal').classList.add('show'); }
+function openSectionModal(roomId) {
+    document.getElementById('sectionForm').action = '{{ url('rooms') }}/' + roomId + '/sections';
+    document.getElementById('sectionModal').classList.add('show');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(function(el) {
+    el.addEventListener('click', function(e) { if(e.target === this) this.classList.remove('show'); });
+});
+</script>
 </body>
 </html>

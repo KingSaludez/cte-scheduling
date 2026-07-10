@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
 use App\Models\Room;
+use App\Models\Section;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -22,7 +23,7 @@ class RoomController extends Controller
             $query->where('room_type', $request->room_type);
         }
 
-        $rooms = $query->orderBy('building')->orderBy('room_number')->paginate(15);
+        $rooms = $query->with('sections')->orderBy('building')->orderBy('room_number')->paginate(15);
 
         return view('rooms.index', compact('rooms'));
     }
@@ -64,5 +65,34 @@ class RoomController extends Controller
         $room->delete();
         return redirect()->route('rooms.index')
             ->with('success', 'Room deleted successfully.');
+    }
+
+    public function storeSection(Request $request, Room $room)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'year_level' => 'required|integer|min:1|max:6',
+            'student_count' => 'nullable|integer|min:0',
+        ]);
+
+        $section = $room->sections()->create([
+            'name' => $validated['name'],
+            'year_level' => $validated['year_level'],
+            'student_count' => $validated['student_count'] ?? 0,
+        ]);
+
+        return redirect()->route('rooms.index')
+            ->with('success', "Section '{$section->name}' created successfully.");
+    }
+
+    public function destroySection(Room $room, Section $section)
+    {
+        if ($section->room_id !== $room->id) {
+            abort(404);
+        }
+        $section->delete();
+
+        return redirect()->route('rooms.index')
+            ->with('success', 'Section deleted successfully.');
     }
 }
