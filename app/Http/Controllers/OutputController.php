@@ -21,11 +21,13 @@ class OutputController extends Controller
         $selectedDay = $dayLabels[$selectedDayCode] ?? 'Monday';
 
         $timeSlots = [];
+        $timeLabels = [];
         for ($h = 7; $h <= 20; $h++) {
-            $timeSlots[] = sprintf('%02d:00', $h);
-            if ($h < 20 || $h === 20) {
-                $timeSlots[] = sprintf('%02d:30', $h);
-            }
+            $hStr = sprintf('%02d', $h);
+            $timeSlots[] = $hStr . ':00';
+            $timeLabels[$hStr . ':00'] = ($h > 12 ? $h - 12 : $h) . ':00 ' . ($h >= 12 ? 'PM' : 'AM');
+            $timeSlots[] = $hStr . ':30';
+            $timeLabels[$hStr . ':30'] = ($h > 12 ? $h - 12 : $h) . ':30 ' . ($h >= 12 ? 'PM' : 'AM');
         }
 
         $academicYear = $request->academic_year ?? date('Y') . '-' . (date('Y') + 1);
@@ -56,6 +58,41 @@ class OutputController extends Controller
             }
         }
 
+        $lunchSlots = ['12:00', '12:30'];
+        $cellStates = [];
+        $cellMeta = [];
+        foreach ($columns as $col) {
+            $key = $col['key'];
+            $scheds = $matrix[$key] ?? [];
+            $states = [];
+            $meta = [];
+            foreach ($timeSlots as $t) {
+                $states[$t] = in_array($t, $lunchSlots) ? 'lunch' : 'empty';
+                $meta[$t] = null;
+            }
+            foreach ($scheds as $startTime => $sched) {
+                $startIdx = array_search($startTime, $timeSlots);
+                if ($startIdx === false) continue;
+                $endIdx = array_search($sched->end_time, $timeSlots);
+                if ($endIdx === false || $endIdx <= $startIdx) $endIdx = count($timeSlots);
+                $lunchIdx = array_search('12:00', $timeSlots);
+                if ($lunchIdx !== false && $startIdx < $lunchIdx && $endIdx > $lunchIdx) {
+                    $endIdx = $lunchIdx;
+                }
+                $rowspan = $endIdx - $startIdx;
+                if ($rowspan <= 0) continue;
+                $states[$startTime] = 'schedule';
+                $meta[$startTime] = ['schedule' => $sched, 'rowspan' => $rowspan];
+                for ($j = $startIdx + 1; $j < $endIdx; $j++) {
+                    if (!in_array($timeSlots[$j], $lunchSlots)) {
+                        $states[$timeSlots[$j]] = 'skip';
+                    }
+                }
+            }
+            $cellStates[$key] = $states;
+            $cellMeta[$key] = $meta;
+        }
+
         if ($request->has('pdf')) {
             $pdf = Pdf::loadView('outputs.matrix-pdf', compact('columns', 'timeSlots', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'academicYear', 'semester'));
             $pdf->setPaper('A4', 'landscape');
@@ -63,7 +100,7 @@ class OutputController extends Controller
         }
 
         $pageTitle = 'Master Schedule Matrix';
-        return view('outputs.matrix', compact('columns', 'timeSlots', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'subjects', 'faculties', 'academicYear', 'semester', 'pageTitle'));
+        return view('outputs.matrix', compact('columns', 'timeSlots', 'timeLabels', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'subjects', 'faculties', 'academicYear', 'semester', 'pageTitle', 'cellStates', 'cellMeta'));
     }
 
     public function matrixStore(Request $request)

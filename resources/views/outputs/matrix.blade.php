@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle }} - {{ config('app.name') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -160,49 +162,7 @@
                 <p style="font-size:13px;margin-top:8px;">Assign sections to rooms first, then the matrix will display here.</p>
             </div>
         @else
-            @php
-                $lunchSlots = ['12:00', '12:30'];
-                $cellStates = [];
-                $cellMeta = [];
-
-                foreach ($columns as $col) {
-                    $key = $col['key'];
-                    $scheds = $matrix[$key] ?? [];
-                    $states = [];
-                    $meta = [];
-
-                    foreach ($timeSlots as $t) {
-                        $states[$t] = in_array($t, $lunchSlots) ? 'lunch' : 'empty';
-                        $meta[$t] = null;
-                    }
-
-                    foreach ($scheds as $startTime => $sched) {
-                        $startIdx = array_search($startTime, $timeSlots);
-                        if ($startIdx === false) continue;
-                        $endIdx = array_search($sched->end_time, $timeSlots);
-                        if ($endIdx === false || $endIdx <= $startIdx) $endIdx = count($timeSlots);
-
-                        $lunchIdx = array_search('12:00', $timeSlots);
-                        if ($lunchIdx !== false && $startIdx < $lunchIdx && $endIdx > $lunchIdx) {
-                            $endIdx = $lunchIdx;
-                        }
-
-                        $rowspan = $endIdx - $startIdx;
-                        if ($rowspan <= 0) continue;
-
-                        $states[$startTime] = 'schedule';
-                        $meta[$startTime] = ['schedule' => $sched, 'rowspan' => $rowspan];
-                        for ($j = $startIdx + 1; $j < $endIdx; $j++) {
-                            if (!in_array($timeSlots[$j], $lunchSlots)) {
-                                $states[$timeSlots[$j]] = 'skip';
-                            }
-                        }
-                    }
-
-                    $cellStates[$key] = $states;
-                    $cellMeta[$key] = $meta;
-                }
-            @endphp
+            @php $lunchSlots = ['12:00', '12:30']; @endphp
 
             <div class="matrix-wrap">
                 <table class="matrix">
@@ -219,7 +179,7 @@
                         @foreach($timeSlots as $i => $time)
                             @php $isLunch = in_array($time, $lunchSlots); @endphp
                             <tr class="{{ $isLunch ? 'lunch-row' : '' }}">
-                                <td class="time-col">{{ \Carbon\Carbon::createFromFormat('H:i', $time)->format('g:i A') }}</td>
+                                <td class="time-col">{{ $timeLabels[$time] ?? $time }}</td>
                                 @if($isLunch)
                                     <td colspan="{{ count($columns) }}" style="text-align:center;font-weight:600;">🍽️ LUNCH BREAK</td>
                                 @else
