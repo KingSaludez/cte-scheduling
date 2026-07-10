@@ -94,7 +94,7 @@ class OutputController extends Controller
         }
 
         if ($request->has('pdf')) {
-            $pdf = Pdf::loadView('outputs.matrix-pdf', compact('columns', 'timeSlots', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'academicYear', 'semester'));
+            $pdf = Pdf::loadView('outputs.matrix-pdf', compact('columns', 'timeSlots', 'timeLabels', 'cellStates', 'cellMeta', 'selectedDay', 'selectedDayCode', 'dayLabels', 'academicYear', 'semester'));
             $pdf->setPaper('A4', 'landscape');
             return $pdf->download('master-schedule-matrix.pdf');
         }
