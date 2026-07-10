@@ -49,9 +49,9 @@ Route::get('/debug-db', function () {
     }
 });
 
-Route::middleware('auth')->get('/run-migrations', function () {
+Route::get('/run-migrations', function () {
     try {
-        Artisan::call('migrate', ['--force' => true]);
+        Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
         $output = Artisan::output();
         $hasProgramsTable = Schema::hasTable('programs');
         $migrations = DB::table('migrations')->orderBy('id')->get();
