@@ -10,8 +10,6 @@ use App\Models\Subject;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-
 class OutputController extends Controller
 {
     public function matrix(Request $request)
@@ -25,12 +23,6 @@ class OutputController extends Controller
 
         if ($request->has('pdf')) {
             return $this->matrixPdf($selectedDay, $academicYear, $semester, $dayLabels, $selectedDayCode);
-        }
-
-        $cacheKey = "matrix_{$selectedDayCode}_{$academicYear}_{$semester}";
-        $cached = Cache::get($cacheKey);
-        if ($cached) {
-            return view('outputs.matrix', array_merge($cached, compact('pageTitle')));
         }
 
         $timeSlots = [];
@@ -104,9 +96,7 @@ class OutputController extends Controller
             $cellMeta[$key] = $meta;
         }
 
-        $viewData = compact('columns', 'timeSlots', 'timeLabels', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'subjects', 'faculties', 'academicYear', 'semester', 'cellStates', 'cellMeta');
-        Cache::put($cacheKey, $viewData, now()->addMinutes(5));
-        return view('outputs.matrix', array_merge($viewData, compact('pageTitle')));
+        return view('outputs.matrix', compact('columns', 'timeSlots', 'timeLabels', 'matrix', 'selectedDay', 'selectedDayCode', 'dayLabels', 'subjects', 'faculties', 'academicYear', 'semester', 'cellStates', 'cellMeta', 'pageTitle'));
     }
 
     private function matrixPdf($selectedDay, $academicYear, $semester, $dayLabels, $selectedDayCode)
@@ -232,8 +222,6 @@ class OutputController extends Controller
             ? count($created) . ' created, but conflicts blocked: ' . implode('; ', $conflicts)
             : null;
 
-        $this->clearMatrixCache($validated['days'], $validated['academic_year'], $validated['semester']);
-
         return response()->json([
             'success' => true,
             'count' => count($created),
@@ -243,20 +231,8 @@ class OutputController extends Controller
 
     public function matrixDestroy(Schedule $schedule)
     {
-        $dayCodes = ['Monday' => 'M', 'Tuesday' => 'T', 'Thursday' => 'Th', 'Friday' => 'F', 'Saturday' => 'S'];
-        $code = $dayCodes[$schedule->day] ?? null;
-        if ($code) {
-            Cache::forget("matrix_{$code}_{$schedule->academic_year}_{$schedule->semester}");
-        }
         $schedule->delete();
         return response()->json(['success' => true]);
-    }
-
-    private function clearMatrixCache(array $days, string $academicYear, string $semester): void
-    {
-        foreach ($days as $code) {
-            Cache::forget("matrix_{$code}_{$academicYear}_{$semester}");
-        }
     }
 
     private function checkConflict($roomId, $facultyId, $day, $start, $end, $excludeSectionId = null)
