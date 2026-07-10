@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $program->code }} Subjects - {{ config('app.name') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,7 +94,7 @@
             <div style="margin-bottom:12px;font-size:13px;font-weight:600;color:#64748b;">Select Year Level</div>
             <div class="btn-row">
                 @foreach($allYears as $yr)
-                <a href="{{ route('programs.subjects', [$program, 'year_level' => $yr, 'semester' => $semester]) }}" class="btn {{ (int)$yearLevel === $yr ? 'btn-primary active' : 'btn-outline' }} btn-sm">{{ $yr }}st</a>
+                <a href="{{ route('programs.subjects', [$program, 'year_level' => $yr, 'semester' => $semester]) }}" class="btn {{ (int)$yearLevel === $yr ? 'btn-primary active' : 'btn-outline' }} btn-sm">{{ $yr }}@switch($yr)@case(1)st@case(2)nd@case(3)rd@default th@endswitch</a>
                 @endforeach
             </div>
             <div style="margin-bottom:12px;font-size:13px;font-weight:600;color:#64748b;">Select Semester</div>

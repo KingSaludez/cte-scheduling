@@ -51,7 +51,7 @@ class ReportController extends Controller
 
     public function roomUtilization()
     {
-        $rooms = Room::active()->with('schedules')->get();
+        $rooms = Room::active()->with('schedules.subject', 'schedules.faculty', 'schedules.section')->get();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         $pdf = Pdf::loadView('reports.room-utilization', compact('rooms', 'days'));

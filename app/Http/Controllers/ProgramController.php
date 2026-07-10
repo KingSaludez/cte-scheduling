@@ -50,14 +50,7 @@ class ProgramController extends Controller
         $yearLevel = $request->year_level ?? 1;
         $semester = $request->semester ?? '1st';
 
-        // Get subjects with same base name (e.g., PATHFit 1, PATHFit 2) for prerequisites
-        $existingSubjects = Subject::where('program_id', $program->id)
-            ->where(function ($q) {
-                $q->whereRaw('1=0'); // start with no match, we'll add conditions
-            })
-            ->get();
-
-        // For prerequisite: get subjects from lower year/semester in same program
+        // For prerequisites: get subjects from lower year/semester in same program
         $prereqPool = Subject::where('program_id', $program->id)
             ->where(function ($q) use ($yearLevel, $semester) {
                 $q->where('year_level', '<', $yearLevel);

@@ -13,6 +13,7 @@ use App\Http\Controllers\SchedulingController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -26,6 +27,9 @@ Route::get('/ping', function () {
 });
 
 Route::middleware('auth')->get('/run-migrations', function () {
+    if (Auth::user()->role !== 'admin') {
+        abort(403);
+    }
     try {
         Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
         $output = Artisan::output();

@@ -23,7 +23,7 @@ class FacultyController extends Controller
             $query->where('employment_status', $request->employment_status);
         }
 
-        $faculties = $query->orderBy('full_name')->paginate(15);
+        $faculties = $query->with('user')->orderBy('full_name')->paginate(15);
 
         return view('faculties.index', compact('faculties'));
     }

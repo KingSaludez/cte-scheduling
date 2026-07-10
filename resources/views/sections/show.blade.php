@@ -70,7 +70,7 @@
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach ($section->schedules as $schedule)
                                             <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap">{{ $schedule->subject ?? 'N/A' }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap">{{ $schedule->subject->code ?? 'N/A' }}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">{{ $schedule->room->room_number ?? 'N/A' }}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">{{ $schedule->day ?? 'N/A' }}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
