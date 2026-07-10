@@ -46,9 +46,10 @@ class OutputController extends Controller
 
     public function workload(Request $request)
     {
-        $faculties = Faculty::active()->with(['schedules' => function ($q) {
-            $q->with(['subject', 'section', 'room'])->orderBy('day')->orderBy('start_time');
-        }])->orderBy('full_name')->get();
+        $faculties = Faculty::active()
+            ->with(['schedules' => fn($q) => $q->with(['subject', 'section', 'room'])->orderBy('day')->orderBy('start_time')])
+            ->orderBy('full_name')
+            ->paginate(10);
 
         return view('outputs.workload', compact('faculties'));
     }

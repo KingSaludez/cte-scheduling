@@ -35,6 +35,10 @@
         .btn-golden { background: #d97706; color: #fff; }
         .btn-golden:hover { background: #b45309; }
         .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+        .pagination { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+        .pagination a, .pagination span { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #475569; text-decoration: none; transition: all 0.15s; }
+        .pagination a:hover { background: #f1f5f9; }
+        .pagination .active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
         .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
         .card-body { padding: 20px; }
         @media (min-width: 1024px) { .sidebar { left: 0; } .hamburger { display: none; } .sidebar-overlay { display: none !important; } .main { margin-left: 260px; padding: 24px 32px; } }
@@ -62,7 +66,7 @@
 <div class="main">
     <div class="page-header"><h1>Faculty Workload Forms</h1></div>
 
-    @foreach($faculties as $faculty)
+        @foreach($faculties as $faculty)
         @php
             $totalUnits = $faculty->schedules->sum(fn($s) => $s->subject->units ?? 0);
             $preparations = $faculty->schedules->pluck('subject_id')->unique()->count();
@@ -147,6 +151,8 @@
             </div>
         </div>
     @endforeach
+
+    <div class="pagination">{{ $faculties->links() }}</div>
 </div>
 </body>
 </html>
