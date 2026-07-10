@@ -16,7 +16,7 @@
                         Faculties
                     </x-nav-link>
                     @endif
-                    <x-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">
+                    <x-nav-link :href="route('programs.index')" :active="request()->routeIs('programs.*')">
                         Subjects
                     </x-nav-link>
                     <x-nav-link :href="route('sections.index')" :active="request()->routeIs('sections.*')">
@@ -73,7 +73,7 @@
             @if(Auth::user()->role !== 'faculty')
             <x-responsive-nav-link :href="route('faculties.index')" :active="request()->routeIs('faculties.*')">Faculties</x-responsive-nav-link>
             @endif
-            <x-responsive-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">Subjects</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('programs.index')" :active="request()->routeIs('programs.*')">Programs</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('sections.index')" :active="request()->routeIs('sections.*')">Sections</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">Rooms</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('schedules.index')" :active="request()->routeIs('schedules.*')">Schedules</x-responsive-nav-link>

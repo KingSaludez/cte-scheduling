@@ -60,7 +60,7 @@
                         </div>
                         <div class="flex items-center gap-2 mt-6">
                             <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded">Update</button>
-                            <a href="{{ route('subjects.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancel</a>
+                            <a href="{{ route('programs.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancel</a>
                         </div>
                     </form>
                 </div>

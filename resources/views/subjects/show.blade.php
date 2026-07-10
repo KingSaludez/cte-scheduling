@@ -34,7 +34,7 @@
 
                     <div class="flex gap-2 mt-6">
                         <a href="{{ route('subjects.edit', $subject) }}" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded">Edit</a>
-                        <a href="{{ route('subjects.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Back</a>
+                        <a href="{{ route('programs.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Back to Programs</a>
                     </div>
                 </div>
             </div>

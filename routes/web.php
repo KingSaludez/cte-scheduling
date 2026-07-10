@@ -26,7 +26,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('faculties', FacultyController::class);
-    Route::resource('subjects', SubjectController::class);
+    Route::get('subjects', fn() => redirect()->route('programs.index'))->name('subjects.index');
+    Route::resource('subjects', SubjectController::class)->except(['index']);
     Route::resource('sections', SectionController::class);
     Route::resource('rooms', RoomController::class);
     Route::get('schedules', [SchedulingController::class, 'index'])->name('schedules.index');
