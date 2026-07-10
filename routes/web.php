@@ -26,6 +26,15 @@ Route::get('/ping', function () {
     return 'pong';
 });
 
+Route::get('/health', function () {
+    try {
+        DB::connection()->getPdo();
+        return response()->json(['status' => 'healthy', 'db' => 'connected']);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'unhealthy', 'error' => $e->getMessage()], 500);
+    }
+});
+
 Route::middleware('auth')->get('/run-migrations', function () {
     if (Auth::user()->role !== 'admin') {
         abort(403);
