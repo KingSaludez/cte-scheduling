@@ -23,6 +23,7 @@ Route::get('/', function () {
 });
 
 Route::get('/ping', function () {
+    try { DB::select('SELECT 1'); } catch (\Exception $e) {}
     return 'pong';
 });
 

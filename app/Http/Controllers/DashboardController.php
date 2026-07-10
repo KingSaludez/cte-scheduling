@@ -8,6 +8,7 @@ use App\Models\Schedule;
 use App\Models\Section;
 use App\Models\Subject;
 use App\Services\LoadComputationService;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -28,17 +29,19 @@ class DashboardController extends Controller
             return view('dashboard', compact('load', 'weeklySchedule', 'schedules'));
         }
 
-        $stats = [
-            'faculty_count' => Faculty::active()->count(),
-            'subject_count' => Subject::active()->count(),
-            'section_count' => Section::active()->count(),
-            'room_count' => Room::active()->count(),
-            'draft_schedules' => Schedule::where('status', 'draft')->count(),
-            'generated_schedules' => Schedule::where('status', 'generated')->count(),
-            'reviewed_schedules' => Schedule::where('status', 'reviewed')->count(),
-            'approved_schedules' => Schedule::where('status', 'approved')->count(),
-            'finalized_schedules' => Schedule::where('status', 'finalized')->count(),
-        ];
+        $row = DB::selectOne("
+            SELECT
+                (SELECT COUNT(*) FROM faculties WHERE NOT is_archived) AS faculty_count,
+                (SELECT COUNT(*) FROM subjects WHERE NOT is_archived) AS subject_count,
+                (SELECT COUNT(*) FROM sections WHERE NOT is_archived) AS section_count,
+                (SELECT COUNT(*) FROM rooms WHERE NOT is_archived) AS room_count,
+                (SELECT COUNT(*) FROM schedules WHERE status = 'draft') AS draft_schedules,
+                (SELECT COUNT(*) FROM schedules WHERE status = 'generated') AS generated_schedules,
+                (SELECT COUNT(*) FROM schedules WHERE status = 'reviewed') AS reviewed_schedules,
+                (SELECT COUNT(*) FROM schedules WHERE status = 'approved') AS approved_schedules,
+                (SELECT COUNT(*) FROM schedules WHERE status = 'finalized') AS finalized_schedules
+        ");
+        $stats = (array) $row;
 
         return view('dashboard', compact('stats'));
     }
