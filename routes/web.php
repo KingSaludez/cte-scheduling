@@ -12,6 +12,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SchedulingController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubjectController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -28,12 +29,36 @@ Route::get('/debug-db', function () {
     try {
         $hasProgramsTable = Schema::hasTable('programs');
         $hasProgramIdCol = Schema::hasColumn('subjects', 'program_id');
+        $hasLockTable = Schema::hasTable('migration_lock');
         $migrations = DB::table('migrations')->orderBy('id')->get();
+
+        // Check if migration files exist on disk
+        $files = glob(database_path('migrations/*.php'));
+        $fileNames = array_map(fn($f) => basename($f), $files);
+
         return response()->json([
             'has_programs_table' => $hasProgramsTable,
             'has_program_id_col' => $hasProgramIdCol,
-            'migrations' => $migrations->pluck('migration'),
+            'has_lock_table' => $hasLockTable,
+            'migrations_in_db' => $migrations->map(fn($m) => ['migration' => $m->migration, 'batch' => $m->batch]),
             'migration_count' => $migrations->count(),
+            'files_on_disk' => $fileNames,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+
+Route::middleware('auth')->get('/run-migrations', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true, '--isolated' => true]);
+        $output = Artisan::output();
+        $hasProgramsTable = Schema::hasTable('programs');
+        $migrations = DB::table('migrations')->orderBy('id')->get();
+        return response()->json([
+            'artisan_output' => $output,
+            'migrations_in_db' => $migrations->map(fn($m) => ['migration' => $m->migration, 'batch' => $m->batch]),
+            'has_programs_table' => $hasProgramsTable,
         ]);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);

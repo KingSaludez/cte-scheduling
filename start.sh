@@ -18,10 +18,9 @@ EOF
 echo "Clearing caches..."
 php artisan route:clear
 php artisan view:clear
-php artisan cache:clear
 
 echo "Running migrations..."
-php artisan migrate --force
+php artisan migrate --force --isolated 2>&1 || echo "Migration had errors (continuing)"
 
 echo "Starting Laravel server..."
 php artisan serve --host=0.0.0.0 --port=$PORT
