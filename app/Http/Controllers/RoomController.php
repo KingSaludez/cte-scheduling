@@ -73,12 +73,16 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'year_level' => 'required|integer|min:1|max:6',
             'student_count' => 'nullable|integer|min:0',
+            'semester' => 'nullable|in:1st,2nd,summer',
+            'academic_year' => 'nullable|string|max:20',
         ]);
 
         $section = $room->sections()->create([
             'name' => $validated['name'],
             'year_level' => $validated['year_level'],
             'student_count' => $validated['student_count'] ?? 0,
+            'semester' => $validated['semester'] ?? '1st',
+            'academic_year' => $validated['academic_year'] ?? (date('Y') . '-' . (date('Y') + 1)),
         ]);
 
         return redirect()->route('rooms.index')

@@ -188,6 +188,8 @@
         <form method="POST" action="" id="sectionForm">
             @csrf
             <input type="hidden" name="room_id" id="sectionRoomId">
+            <input type="hidden" name="semester" value="{{ date('n') >= 8 ? '1st' : (date('n') >= 1 && date('n') <= 5 ? '2nd' : 'summer') }}">
+            <input type="hidden" name="academic_year" value="{{ date('Y') . '-' . (date('Y') + 1) }}">
             <div class="form-group"><label>Section Name</label><input type="text" name="name" required placeholder="e.g. A, B, 1A"></div>
             <div class="form-group"><label>Year Level</label><select name="year_level" required>@for($i=1;$i<=6;$i++)<option value="{{ $i }}">{{ $i }}</option>@endfor</select></div>
             <div class="form-group"><label>Student Count</label><input type="number" name="student_count" min="0" placeholder="Optional"></div>
